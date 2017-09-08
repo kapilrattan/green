@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pm="http://primefaces.org/mobile"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+
+    <h:head>
+        <title>Purchase Receipt</title>
+    </h:head>
+    <h:body>
+        <ui:insert name="header" >
+            <ui:include src="/receipts/Header.xhtml" />
+        </ui:insert>    
+        <h:form>
+            <p:growl id="growl" sticky="true" showDetail="true"/>
+            <p:wizard flowListener="#{createReceiptWizard.onFlowProcess}">
+                <p:tab id="ItemDetails" title="Item Details">
+                    <p:panel header="Item Details">
+                        <p:messages />
+                        <h:panelGrid columns="2" columnClasses="label, value">
+                            <pm:field>
+                                <p:selectOneButton id="itemCondition" value="#{createReceiptWizard.receipt.itemCondition}">
+                                    <f:selectItem itemLabel="Brand New" itemValue="new" />
+                                    <f:selectItem itemLabel="Used Item" itemValue="used" />
+                                </p:selectOneButton>
+                            </pm:field> 
+                            <pm:field>
+                                <p:selectOneButton id="storeName" value="#{createReceiptWizard.receipt.storeName}">
+                                    <f:selectItem itemLabel="Central" itemValue="central" />
+                                    <f:selectItem itemLabel="Newtown" itemValue="newtown" />
+                                </p:selectOneButton>
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="customerName" placeholder="Customer Name" value="#{createReceiptWizard.receipt.customerName}" title="#{bundle.CreateReceiptsTitle_customerName}"/>
+                            </pm:field>
+                            <pm:field>
+                                <p:calendar id="date" value="#{createReceiptWizard.receipt.date}"  placeholder="Date" title="#{bundle.CreateReceiptsTitle_date}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:calendar>
+                            </pm:field>
+
+                            <pm:field>
+                                <p:inputText id="customerContactNumber" placeholder="Contact Number" value="#{createReceiptWizard.receipt.customerContactNumber}" title="#{bundle.CreateReceiptsTitle_customerContactNumber}" type="tel" />
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="customerEmail" placeholder="Customer Email" value="#{createReceiptWizard.receipt.customerEmail}" title="#{bundle.CreateReceiptsTitle_customerEmail}" type="email"/>
+                            </pm:field>
+                            <pm:field>
+                                <p:inputTextarea id="custimerAddress"  placeholder="Customer Address" value="#{createReceiptWizard.receipt.custimerAddress}" title="#{bundle.CreateReceiptsTitle_custimerAddress}" rows="5" cols="30" counter="customerAddressDisplay" maxlength="10" counterTemplate="{0} characters remaining." autoResize="false" />
+                                <br/>
+                                <h:outputText id="customerAddressDisplay" />
+                            </pm:field>
+
+                            <pm:field>
+                                <p:inputTextarea id="itemDescription" placeholder="Item Description" value="#{createReceiptWizard.receipt.itemDescription}" title="#{bundle.CreateReceiptsTitle_itemDescription}" rows="5" cols="30" counter="itemDescriptionDisplay" maxlength="10" counterTemplate="{0} characters remaining." autoResize="false" />
+                                <br/>
+                                <h:outputText id="itemDescriptionDisplay" />
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="itemNumber" placeholder="IMEI / Serial Number" value="#{createReceiptWizard.receipt.itemNumber}" title="#{bundle.CreateReceiptsTitle_itemNumber}" />
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="receiptAmount" placeholder="Amount" value="#{createReceiptWizard.receipt.receiptAmount}" title="#{bundle.CreateReceiptsTitle_receiptAmount}" />
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="customerIdType" placeholder="Customer Photo Id Type" value="#{createReceiptWizard.receipt.customerIdType}" title="#{bundle.CreateReceiptsTitle_customerIdType}" />                        
+                            </pm:field>
+                            <pm:field>
+                                <p:inputText id="customerIdNumber" placeholder="Customer Photo Id Number" value="#{createReceiptWizard.receipt.customerIdNumber}" title="#{bundle.CreateReceiptsTitle_customerIdNumber}" />
+                            </pm:field>
+                            <pm:field>
+                                <p:calendar id="customerIdExpiryDate" placeholder="Customer Photo Id Expiry Date" value="#{createReceiptWizard.receipt.customerIdExpiryDate}" title="#{bundle.CreateReceiptsTitle_customerIdExpiryDate}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </p:calendar>
+                            </pm:field>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:tab>
+                <p:tab id="PhotoId" title="Photo Id">
+                    <p:panel header="Photo Id">
+                        <p:messages />
+                        <h:panelGrid columns="3" cellpadding="5">
+                            <p:photoCam widgetVar="pc" listener="#{createReceiptWizard.oncapture}" update="photo" />
+                            <p:commandButton type="button" value="Capture" onclick="PF('pc').capture()"/>
+                            <p:outputPanel id="photo">
+                                <p:graphicImage name="demo/images/photocam/#{createReceiptWizard.filename}.jpeg" rendered="#{not empty createReceiptWizard.filename}"/>
+                            </p:outputPanel>
+                        </h:panelGrid>                            
+                    </p:panel>
+                </p:tab>
+                <p:tab id="CustomerSignature" title="Customer Signature">
+                    <p:panel header="Customer Signature">
+                        <p:messages />
+                        <h:panelGrid columns="2" columnClasses="label, value">
+                            <p:signature style="width:400px;height:200px" widgetVar="sig" value="#{createReceiptWizard.receipt.signatureValue}" required="true" label="Signature" guideline="true"/>
+
+                            <div style="margin:20px 0">
+                                <p:commandButton value="Submit" icon="ui-icon-check" update="output"/>
+                                <p:commandButton value="Clear" icon="ui-icon-close" type="button" onclick="PF('sig').clear()"/>
+                            </div>
+
+                            <p:outputPanel id="output">
+                                <h:outputText rendered="#{not empty createReceiptWizard.receipt.signatureValue}" style="font-size:24px;display:block" value="Your Signature" />
+                                <p:signature style="width:400px;height:200px;" value="#{createReceiptWizard.receipt.signatureValue}" readonly="true"
+                                             rendered="#{not empty createReceiptWizard.receipt.signatureValue}" backgroundColor="#eaeaea" color="#03a9f4"/>
+                            </p:outputPanel>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:tab>
+                <p:tab id="Confirmation" title="Confirmation">
+                    <p:panel header="Receipt Details">
+                        <p:messages />
+                        <h:panelGrid columns="2" columnClasses="label, value">
+                        </h:panelGrid>
+                    </p:panel>
+                </p:tab>
+            </p:wizard>
+
+        </h:form>
+    </h:body>
+</html>
+
